@@ -1,4 +1,7 @@
 package org.example.possystembackendspring.dto;
 
-public interface CustomerStates {
+import java.io.Serializable;
+import java.security.SecureRandomParameters;
+
+public interface CustomerStates extends Serializable,SuperDTO {
 }

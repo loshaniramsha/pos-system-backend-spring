@@ -1,4 +1,6 @@
 package org.example.possystembackendspring.dto;
 
-public interface ItemStates {
+import java.io.Serializable;
+
+public interface ItemStates extends Serializable,SuperDTO {
 }
