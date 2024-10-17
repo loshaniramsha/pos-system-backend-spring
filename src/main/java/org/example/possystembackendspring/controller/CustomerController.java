@@ -141,5 +141,27 @@ public class CustomerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+   @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") String id){
+        boolean isCustomerIdValid=id.matches(RegexProcess.CUSTOMER_ID_REGEX);
+        try {
+            if (isCustomerIdValid){
+                customerService.deleteCustomer(id);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+        }
+        catch (CustomerNotFoundException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
