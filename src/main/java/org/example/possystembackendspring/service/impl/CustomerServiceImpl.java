@@ -8,12 +8,16 @@ import org.example.possystembackendspring.dao.CustomerDAO;
 import org.example.possystembackendspring.dto.CustomerStates;
 import org.example.possystembackendspring.dto.impl.CustomerDTO;
 import org.example.possystembackendspring.entity.impl.CustomerEntity;
+import org.example.possystembackendspring.exception.CustomerNotFoundException;
 import org.example.possystembackendspring.exception.DataPersistsException;
 import org.example.possystembackendspring.service.CustomerService;
 import org.example.possystembackendspring.util.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -36,8 +40,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(String id, CustomerDTO customerDTO) {
+        Optional<CustomerEntity> optionalCustomerEntity = customerDAO.findById(id);
+        if (!optionalCustomerEntity.isPresent()) {
+            throw new CustomerNotFoundException("Customer not found");
+        }
 
+        CustomerEntity customerEntity = optionalCustomerEntity.get();
+        customerEntity.setName(customerDTO.getName());
+        customerEntity.setAddress(customerDTO.getAddress());
+        customerEntity.setContact(customerDTO.getContact());
+        customerDAO.save(customerEntity);
     }
+
 
     @Override
     public void deleteCustomer(String id) {
@@ -46,7 +60,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerStates getSelectedCustomer(String id) {
-        return null;
+        Optional<CustomerEntity> customerEntity=customerDAO.findById(id);
+        if (customerEntity.isPresent()){
+            return mapping.toCustomerDTO(customerDAO.getReferenceById(id));
+        }else {
+            throw new CustomerNotFoundException("Customer not found");
+        }
     }
 
     @Override
@@ -87,6 +106,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> searchByContact(String value) {
-        return List.of();
+        String jpql = "select c from CustomerEntity c where c.contact like :value";
+        TypedQuery<CustomerEntity> query = entityManager.createQuery(jpql, CustomerEntity.class);
+        query.setParameter("value", "%" + value + "%");
+
+        List<CustomerEntity> customerEntities = query.getResultList();
+        List<CustomerDTO> customerDTOS=new ArrayList<>();
+
+        customerEntities.forEach(customerEntity -> customerDTOS.add(mapping.toCustomerDTO(customerEntity)));
+
+        return customerDTOS;
     }
 }

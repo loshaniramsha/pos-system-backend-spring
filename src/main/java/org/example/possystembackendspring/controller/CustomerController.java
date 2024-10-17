@@ -53,7 +53,9 @@ public class CustomerController {
 */
 package org.example.possystembackendspring.controller;
 
+import org.example.possystembackendspring.dto.CustomerStates;
 import org.example.possystembackendspring.dto.impl.CustomerDTO;
+import org.example.possystembackendspring.exception.CustomerNotFoundException;
 import org.example.possystembackendspring.exception.DataPersistsException;
 import org.example.possystembackendspring.service.CustomerService;
 import org.example.possystembackendspring.util.RegexProcess;
@@ -107,6 +109,37 @@ public class CustomerController {
     @GetMapping(consumes = "application/json")
     public List<CustomerDTO> getAllCustomers(){
         return customerService.getAllCustomers();
-
     }
+
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public List<CustomerDTO> getCustomer(@PathVariable("id") String id){
+        return customerService.searchByContact(id);
+    }
+
+    @GetMapping(value = "/search/{id}", produces = "application/json")
+    public CustomerStates getSelectedCustomer(@PathVariable("id") String id){
+        return customerService.getSelectedCustomer(id);
+    }
+
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<Void> updateCustomer(@PathVariable("id") String id, @RequestBody CustomerDTO customerDTO){
+        boolean isCustomerIdValid=id.matches(RegexProcess.CUSTOMER_ID_REGEX);
+        try {
+            if (isCustomerIdValid){
+                customerService.updateCustomer(id, customerDTO);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }catch (CustomerNotFoundException | DataPersistsException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
