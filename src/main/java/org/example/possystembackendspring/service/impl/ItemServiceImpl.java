@@ -15,6 +15,8 @@ import org.example.possystembackendspring.util.Mapping;
 import org.example.possystembackendspring.util.RegexProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -84,6 +86,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> searchByItemCode(String newItemCode) {
-        return List.of();
+        String jpql = "SELECT i FROM ItemEntity i WHERE i.id LIKE :itemCode";
+        TypedQuery<ItemEntity> query = entityManager.createQuery(jpql, ItemEntity.class);
+
+        // Use the correct parameter name and include the wildcard for partial matching
+        query.setParameter("itemCode", newItemCode + "%");
+
+        List<ItemEntity> itemEntities = query.getResultList();
+        List<ItemDTO> itemDTOS = new ArrayList<>();
+
+        // Convert the entities to DTOs
+        itemEntities.forEach(itemEntity -> itemDTOS.add(mapper.toItemDTO(itemEntity)));
+
+        return itemDTOS;
     }
+
 }
