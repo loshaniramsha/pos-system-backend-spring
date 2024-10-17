@@ -10,6 +10,7 @@ import org.example.possystembackendspring.dto.ItemStates;
 import org.example.possystembackendspring.dto.impl.ItemDTO;
 import org.example.possystembackendspring.entity.impl.ItemEntity;
 import org.example.possystembackendspring.exception.DataPersistsException;
+import org.example.possystembackendspring.exception.ItemNotFoundException;
 import org.example.possystembackendspring.service.ItemService;
 import org.example.possystembackendspring.util.Mapping;
 import org.example.possystembackendspring.util.RegexProcess;
@@ -41,11 +42,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void updateItem(String id, ItemDTO itemDTO) {
-
+        ItemEntity itemEntity = itemDao.getReferenceById(id);
+        if (itemEntity==null){
+            throw new ItemNotFoundException("Item not found");
+        }
+        itemEntity.setDescription(itemDTO.getDescription());
+        itemEntity.setUnitPrice(itemDTO.getUnitPrice());
+        itemEntity.setQtyOnHand(itemDTO.getQty());
+        itemDao.save(itemEntity);
     }
 
     @Override
     public void deleteItem(String id) {
+        ItemEntity item=itemDao.getReferenceById(id);
+        if (item==null){
+            throw new ItemNotFoundException("Item not found");
+        }
+        itemDao.delete(item);
 
     }
 

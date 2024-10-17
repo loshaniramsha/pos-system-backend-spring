@@ -58,6 +58,48 @@ public class ItemController {
     public List<ItemDTO> getItem(@PathVariable("id") String id){
         return itemService.searchByItemCode(id);
     }
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateItem(@PathVariable("id") String id, @RequestBody ItemDTO itemDTO) {
+        boolean isItemIdValid=id.matches(RegexProcess.ITEM_ID_REGEX);
+        try {
+            if (isItemIdValid) {
+                itemService.updateItem(id, itemDTO);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (ItemNotFoundException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable("id") String id){
+        boolean isItemIdValid=id.matches(RegexProcess.ITEM_ID_REGEX);
+        try {
+            if (isItemIdValid){
+                itemService.deleteItem(id);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (ItemNotFoundException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 
