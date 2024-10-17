@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.example.possystembackendspring.customeStatescode.SelectedItemStatus;
 import org.example.possystembackendspring.dao.ItemDAO;
 import org.example.possystembackendspring.dto.ItemStates;
 import org.example.possystembackendspring.dto.impl.ItemDTO;
@@ -48,7 +49,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemStates getSelectedItem(String id) {
-        return null;
+        ItemEntity item=itemDao.getReferenceById(id);
+        if (item==null){
+            return new SelectedItemStatus(1,"Item not found");
+        }
+        return mapper.toItemDTO(item);
     }
 
     @Override
