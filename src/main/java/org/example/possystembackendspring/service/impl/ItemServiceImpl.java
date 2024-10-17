@@ -53,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> getAllItem() {
-        return List.of();
+        return mapper.toItemDTOList(itemDao.findAll());
     }
 
     @Override
@@ -69,19 +69,13 @@ public class ItemServiceImpl implements ItemService {
 
         // Check for the last valid ID
         for (String id : ids) {
-            if (id != null && id.matches("ITEM\\d+")) {  // Ensure the format is valid
-                int lastIdNumber = Integer.parseInt(id.substring(4)); // Extract the numeric part
-                return String.format("ITEM%03d", lastIdNumber + 1);  // Increment and format the ID
+            if (id != null && id.matches("ITEM\\d+")) {
+                int lastIdNumber = Integer.parseInt(id.substring(4));
+                return String.format("ITEM%03d", lastIdNumber + 1);
             }
         }
-
-        // If no valid ID is found, return a default ID
-        return "ITEM001";  // Fallback default ID if no valid IDs are found
+        return "ITEM001";
     }
-
-
-
-
 
     @Override
     public List<ItemDTO> searchByItemCode(String newItemCode) {

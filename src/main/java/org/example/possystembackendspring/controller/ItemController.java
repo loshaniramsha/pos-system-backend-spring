@@ -49,5 +49,9 @@ public class ItemController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // General error handling
         }
     }
+    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<ItemDTO> getAllItem(){
+        return itemService.getAllItem();
+    }
 
 }
