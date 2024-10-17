@@ -54,13 +54,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(String id) {
-        ItemEntity item=itemDao.getReferenceById(id);
-        if (item==null){
-            throw new ItemNotFoundException("Item not found");
+        // Check if the item exists
+        if (itemDao.existsById(id)) {
+            itemDao.deleteById(id);
+            System.out.println("Item deleted with ID: " + id);
+        } else {
+            // Log the exception for debugging
+            System.out.println("Item not found in the database: " + id);
+            throw new ItemNotFoundException("Item not found with ID: " + id);
         }
-        itemDao.delete(item);
-
     }
+
 
     @Override
     public ItemStates getSelectedItem(String id) {

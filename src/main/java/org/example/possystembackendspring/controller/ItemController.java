@@ -80,24 +80,28 @@ public class ItemController {
         }
     }
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable("id") String id){
-        boolean isItemIdValid=id.matches(RegexProcess.ITEM_ID_REGEX);
+    public ResponseEntity<Void> deleteItem(@PathVariable("id") String id) {
+
+        System.out.println("Delete request for item ID: " + id);
+
+        boolean isItemIdValid = id.matches(RegexProcess.ITEM_ID_REGEX);
+        if (!isItemIdValid) {
+            // Log invalid ID format
+            System.out.println("Invalid Item ID format: " + id);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 400 Bad Request
+        }
         try {
-            if (isItemIdValid){
-                itemService.deleteItem(id);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-        catch (ItemNotFoundException e){
+            // Call the service to delete the item
+            itemService.deleteItem(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content on successful deletion
+        } catch (ItemNotFoundException e) {
+            // Log the exception for debugging
+            System.out.println("Item not found with ID: " + id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404 Not Found
+        } catch (Exception e) {
+            // Log the unexpected error
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 500 Internal Server Error
         }
     }
 }
