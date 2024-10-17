@@ -62,6 +62,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("api/v1/customer")
@@ -100,5 +103,10 @@ public class CustomerController {
             e.printStackTrace();
             return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping(consumes = "application/json")
+    public List<CustomerDTO> getAllCustomers(){
+        return customerService.getAllCustomers();
+
     }
 }
